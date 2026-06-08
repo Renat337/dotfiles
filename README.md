@@ -1,36 +1,49 @@
 # Dotfiles
 
 ## Installation
-- Clone the repo somewhere using `git clone --recurse-submodules https://github.com/Renat337/dotfiles`
-- Symlink each directory into ~/.config (unless you have nothing else in .config then you can directly put it there) eg. `ln -s ~/dotfiles/zsh ~/.config/zsh`
-- Install dependencies below
+
+1. Clone the repo:
+   ```sh
+   git clone --recurse-submodules https://github.com/Renat337/dotfiles
+   ```
+
+2. Symlink each directory into `~/.config/`:
+   ```sh
+   ln -s ~/dotfiles/zsh ~/.config/zsh
+   ln -s ~/dotfiles/nvim ~/.config/nvim
+   ln -s ~/dotfiles/tmux ~/.config/tmux
+   ln -s ~/dotfiles/kitty ~/.config/kitty
+   ```
+
+3. Create required directories:
+   ```sh
+   mkdir -p ~/.cache/zsh
+   mkdir -p ~/.local/state/zsh
+   ```
+
+4. Set up the zsh bootstrap — create `~/.zshenv` with:
+   ```sh
+   export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+   export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+   ```
+   This is the one file that must live in `$HOME`. It tells zsh to read all config from `~/.config/zsh/` instead.
+
+   Alternatively, if you have root access and are the only user, you can put this in `/etc/zshenv` instead for a completely clean home directory.
+
+5. Install dependencies below.
 
 ## Dependencies
+
 ### Zsh
 - zsh
-- starship
-
-#### Note
-For Zsh, you will need to either make your `/etc/zshenv` file into:
-```
-if [[ -z "$XDG_CONFIG_HOME" ]]
-then
-    export XDG_CONFIG_HOME="$HOME/.config"
-fi
-
-if [[ -d "$XDG_CONFIG_HOME/zsh" ]]
-then
-    export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
-fi
-```
-
-or move the standard `.zshenv` into `~`.
+- starship (`brew install starship`)
+- cargo (`.zshenv` sources `$HOME/.cargo/env`)
 
 ### Neovim
 - nvim
-- node (for lsp servers)
-- tree-sitter (but this is a nvim dependency installed by brew)
-- tree-sitter-cli
+- node (for LSP servers)
+- tree-sitter (`brew install tree-sitter`)
+- tree-sitter-cli (`brew install tree-sitter-cli`)
 
 ### Tmux
 - tmux
