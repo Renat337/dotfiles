@@ -36,14 +36,19 @@
 
 ### Zsh
 - zsh
-- starship (`brew install starship`)
-- cargo (`.zshenv` sources `$HOME/.cargo/env`)
+- starship
+- fzf
+- zoxide
+- rigpgrep
+- fd
+- bat
+- eza
 
 ### Neovim
 - nvim
 - node (for LSP servers)
-- tree-sitter (`brew install tree-sitter`)
-- tree-sitter-cli (`brew install tree-sitter-cli`)
+- tree-sitter
+- tree-sitter-cli
 
 ### Tmux
 - tmux

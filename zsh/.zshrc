@@ -17,7 +17,7 @@ autoload -Uz compinit
 compinit -d "$XDG_CACHE_HOME/zsh/zcompdump"
 
 zstyle ':completion:*' menu select # Arrow-key menu
-zstyle ':completion:*' matcher-list 'm:{a-z}={A_Z}' # Case-insensitive matching
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # Case-insensitive matching
 
 setopt NOBEEP
 setopt AUTOCD
@@ -28,10 +28,20 @@ export GPG_TTY=$(tty)
 
 bindkey -v
 
-# === Aliases ===
+# === Modular Config ===
 
-alias vim=nvim
+source "$ZDOTDIR/fzf.zsh"
+source "$ZDOTDIR/aliases.zsh"
 
 # === Starship ===
 
 eval "$(starship init zsh)"
+
+# === Fuzzy Finder ===
+
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
+
+# === Zoxide ===
+
+eval "$(zoxide init zsh)" # must keep at end
