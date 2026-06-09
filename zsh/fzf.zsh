@@ -22,3 +22,5 @@ export FZF_ALT_C_OPTS="
  --preview 'eza --tree --icons {}'
  --border
 "
+
+source <(fzf --zsh)

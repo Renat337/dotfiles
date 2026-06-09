@@ -26,9 +26,8 @@ setopt CORRECT # Zsh asks when wrong command
 
 export GPG_TTY=$(tty)
 
-# === Modular Config ===
+# === Aliases ===
 
-source "$ZDOTDIR/fzf.zsh"
 source "$ZDOTDIR/aliases.zsh"
 
 # === Starship ===
@@ -41,8 +40,7 @@ source "$ZDOTDIR/plugins/zsh-vi-mode/zsh-vi-mode.zsh"
 
 # === Fuzzy Finder ===
 
-# Set up fzf key bindings and fuzzy completion
-source <(fzf --zsh)
+source "$ZDOTDIR/fzf.zsh"
 
 # === Zoxide ===
 
