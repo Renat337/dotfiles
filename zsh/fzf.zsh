@@ -1,6 +1,13 @@
 # Ctrl T uses fd
 export FZF_CTRL_T_COMMAND='fd --type f --strip-cwd-prefix'
 
+# Standard UI
+export FZF_DEFAULT_OPTS="
+ --height 40%
+ --layout=reverse
+ --border
+"
+
 # Compact UI
 export FZF_CTRL_T_OPTS="
  --height 40%
