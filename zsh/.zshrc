@@ -38,6 +38,12 @@ eval "$(starship init zsh)"
 
 source "$ZDOTDIR/plugins/zsh-vi-mode/zsh-vi-mode.zsh"
 
+# Always starting with insert mode for each command line
+ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+
+# Do the initialization when the script is sourced (i.e. Initialize instantly)
+ZVM_INIT_MODE=sourcing
+
 # === Fuzzy Finder ===
 
 source "$ZDOTDIR/fzf.zsh"
