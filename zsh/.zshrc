@@ -36,10 +36,9 @@ eval "$(starship init zsh)"
 
 # === Zsh Vi Mode ===
 
-ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
 ZVM_INIT_MODE=sourcing
-
 source "$ZDOTDIR/plugins/zsh-vi-mode/zsh-vi-mode.zsh"
+ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
 
 # === Fuzzy Finder ===
 
