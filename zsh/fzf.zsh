@@ -26,7 +26,7 @@ export FZF_CTRL_R_OPTS="
 # Print tree structure in the preview window
 export FZF_ALT_C_OPTS="
  --walker-skip .git,node_modules,target
- --preview 'eza --tree --icons {}'
+ --preview 'eza --tree --icons --level=2 {}'
  --border
 "
 
