@@ -32,3 +32,8 @@ vim.keymap.set("n", "<leader>cc", function()
 end, { desc = "Copy code.amazon.com link" })
 
 vim.keymap.set("n", "<Esc>", ":noh<CR>", { desc = "Clear search highlight" })
+
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "n", "nzzzv")
+vim.keymap.set("n", "N", "Nzzzv")
