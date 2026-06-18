@@ -31,3 +31,6 @@ export FZF_ALT_C_OPTS="
 "
 
 source <(fzf --zsh)
+
+bindkey -r '\ec'
+bindkey '^G' fzf-cd-widget
