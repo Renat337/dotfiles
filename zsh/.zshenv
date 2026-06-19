@@ -17,3 +17,5 @@ export VISUAL="nvim"
 # Personal binaries/scripts
 export PATH="$HOME/.local/bin:$PATH"
 . "$HOME/.cargo/env"
+
+eval "$(/opt/homebrew/bin/brew shellenv)"

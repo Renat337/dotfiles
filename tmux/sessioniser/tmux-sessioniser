@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/tmux-sessioniser"
+CONFIG_FILE="$CONFIG_DIR/tmux-sessioniser.conf"
+
+# Defaults — override in config file
+# Format: path or path:depth
+TS_SEARCH_PATHS=(~/workplace)
+TS_MAX_DEPTH=3
+
+if [[ -f "$CONFIG_FILE" ]]; then
+    source "$CONFIG_FILE"
+fi
+
+find_dirs() {
+    # Existing tmux sessions
+    if [[ -n "$TMUX" ]]; then
+        current_session=$(tmux display-message -p '#S')
+        tmux list-sessions -F "[tmux] #{session_name}" 2>/dev/null | rg -vFx "[tmux] $current_session"
+    else
+        tmux list-sessions -F "[tmux] #{session_name}" 2>/dev/null
+    fi
+
+    # Zoxide frecency results (most-used dirs first)
+    zoxide query --list 2>/dev/null
+
+    # Directories from search paths via fd
+    for entry in "${TS_SEARCH_PATHS[@]}"; do
+        if [[ "$entry" =~ ^([^:]+):([0-9]+)$ ]]; then
+            path="${BASH_REMATCH[1]}"
+            depth="${BASH_REMATCH[2]}"
+        else
+            path="$entry"
+            depth="$TS_MAX_DEPTH"
+        fi
+
+        [[ -d "$path" ]] && fd . "$path" --type d --max-depth "$depth"
+    done
+}
+
+switch_to() {
+    if [[ -z $TMUX ]]; then
+        tmux attach-session -t "$1"
+    else
+        tmux switch-client -t "$1"
+    fi
+}
+
+has_session() {
+    tmux list-sessions 2>/dev/null | rg -q "^$1:"
+}
+
+# Support --list for fzf reload
+if [[ "${1:-}" == "--list" ]]; then
+    find_dirs | awk '!seen[$0]++'
+    exit 0
+fi
+
+# Build list: store full paths, display basenames
+if [[ $# -eq 1 ]]; then
+    selected="$1"
+else
+    selected=$(find_dirs | awk '!seen[$0]++' | fzf \
+        --height 60% --layout=reverse --border --prompt="session> " \
+        --delimiter / --with-nth -2.. \
+        --header "ctrl-x: delete" \
+        --bind "ctrl-x:execute-silent(
+            if [[ {} == \[tmux\]* ]]; then
+                tmux kill-session -t \"\$(echo {} | sed 's/\[tmux\] //')\";
+            else
+                zoxide remove \"{}\";
+            fi
+        )+reload($0 --list)")
+fi
+
+[[ -z $selected ]] && exit 0
+
+# Handle picking an existing session
+if [[ "$selected" =~ ^\[tmux\]\ (.+)$ ]]; then
+    switch_to "${BASH_REMATCH[1]}"
+    exit 0
+fi
+
+selected_name=$(basename "$selected" | tr '.' '_')
+
+tmux_running=$(pgrep tmux)
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+    tmux new-session -s "$selected_name" -c "$selected"
+    exit 0
+fi
+
+if ! has_session "$selected_name"; then
+    tmux new-session -ds "$selected_name" -c "$selected"
+fi
+
+switch_to "$selected_name"
