@@ -1,6 +1,8 @@
-[user]
-	name = 
-	email = 
+[include]
+    path = local
+
+[init]
+    defaultBranch = main
 
 [core]
 	pager = delta
