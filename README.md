@@ -55,3 +55,7 @@
 
 ### Kitty
 - kitty
+
+### Git
+- git
+- delta
