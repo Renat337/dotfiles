@@ -18,4 +18,7 @@ export VISUAL="nvim"
 export PATH="$HOME/.local/bin:$PATH"
 . "$HOME/.cargo/env"
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# Homebrew
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
