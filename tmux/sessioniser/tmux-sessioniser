@@ -3,28 +3,14 @@
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/tmux-sessioniser"
 CONFIG_FILE="$CONFIG_DIR/tmux-sessioniser.conf"
 
-# Defaults — override in config file
-# Format: path or path:depth
 TS_SEARCH_PATHS=(~/workplace)
 TS_MAX_DEPTH=3
 
-if [[ -f "$CONFIG_FILE" ]]; then
-    source "$CONFIG_FILE"
-fi
+[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
 
 find_dirs() {
-    # Existing tmux sessions
-    if [[ -n "$TMUX" ]]; then
-        current_session=$(tmux display-message -p '#S')
-        tmux list-sessions -F "[tmux] #{session_name}" 2>/dev/null | rg -vFx "[tmux] $current_session"
-    else
-        tmux list-sessions -F "[tmux] #{session_name}" 2>/dev/null
-    fi
-
-    # Zoxide frecency results (most-used dirs first)
     zoxide query --list 2>/dev/null
 
-    # Directories from search paths via fd
     for entry in "${TS_SEARCH_PATHS[@]}"; do
         if [[ "$entry" =~ ^([^:]+):([0-9]+)$ ]]; then
             path="${BASH_REMATCH[1]}"
@@ -38,6 +24,10 @@ find_dirs() {
     done
 }
 
+has_session() {
+    tmux has-session -t "$1" 2>/dev/null
+}
+
 switch_to() {
     if [[ -z $TMUX ]]; then
         tmux attach-session -t "$1"
@@ -46,51 +36,48 @@ switch_to() {
     fi
 }
 
-has_session() {
-    tmux list-sessions 2>/dev/null | rg -q "^$1:"
-}
+selected="$(
+  find_dirs \
+    | awk '!seen[$0]++ {
+        full=$0
 
-# Support --list for fzf reload
-if [[ "${1:-}" == "--list" ]]; then
-    find_dirs | awk '!seen[$0]++'
-    exit 0
-fi
+        # strip trailing slash
+        gsub(/\/$/, "", full)
 
-# Build list: store full paths, display basenames
-if [[ $# -eq 1 ]]; then
-    selected="$1"
-else
-    selected=$(find_dirs | awk '!seen[$0]++' | fzf \
-        --height 60% --layout=reverse --border --prompt="session> " \
-        --delimiter / --with-nth -2.. \
-        --header "ctrl-x: delete" \
-        --bind "ctrl-x:execute-silent(
-            if [[ {} == \[tmux\]* ]]; then
-                tmux kill-session -t \"\$(echo {} | sed 's/\[tmux\] //')\";
-            else
-                zoxide remove \"{}\";
-            fi
-        )+reload($0 --list)")
-fi
+        # basename = directory name
+        n=split(full, arr, "/")
+        name=arr[n]
 
-[[ -z $selected ]] && exit 0
+        printf "%s\t%s\n", full, name
+      }' \
+    | fzf \
+        --height 100% \
+        --layout=reverse \
+        --border \
+        --prompt="session> " \
+        --with-nth=2 \
+        --delimiter=$'\t' \
+        --preview 'eza --tree --icons --level=2 {1}' \
+        --preview-window=right:70%
+)"
 
-# Handle picking an existing session
-if [[ "$selected" =~ ^\[tmux\]\ (.+)$ ]]; then
-    switch_to "${BASH_REMATCH[1]}"
-    exit 0
-fi
+[[ -z "$selected" ]] && exit 0
 
-selected_name=$(basename "$selected" | tr '.' '_')
+selected_path="${selected%%$'\t'*}"
+default_name=$(basename "${selected%%$'\t'*}" | tr '. ' '__')
+
+read -rp "Session name [$default_name]: " selected_name
+selected_name=${selected_name:-$default_name}
 
 tmux_running=$(pgrep tmux)
+
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    tmux new-session -s "$selected_name" -c "$selected"
+    tmux new-session -s "$selected_name" -c "$selected_path"
     exit 0
 fi
 
 if ! has_session "$selected_name"; then
-    tmux new-session -ds "$selected_name" -c "$selected"
+    tmux new-session -ds "$selected_name" -c "$selected_path"
 fi
 
 switch_to "$selected_name"

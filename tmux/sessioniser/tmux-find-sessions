@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+current_session() {
+  tmux display-message -p '#S' 2>/dev/null
+}
+
+session="$(
+  tmux list-sessions -F "#{session_name}" 2>/dev/null |
+  awk -v cur="$(current_session)" '
+    $0 == cur { print "* " $0 }
+    $0 != cur { print "  " $0 }
+  ' |
+  fzf \
+    --height 100% \
+    --layout=reverse \
+    --border \
+    --prompt="session> " \
+    --header="ctrl-x: delete" \
+    --bind "ctrl-x:execute-silent(
+      tmux kill-session -t \$(echo {} | sed 's/^.. //')
+    )+reload(tmux list-sessions -F \"#{session_name}\" 2>/dev/null |
+      awk -v cur=\"\$(tmux display-message -p '#S' 2>/dev/null)\" '
+        \$0 == cur { print \"* \" \$0 }
+        \$0 != cur { print \"  \" \$0 }
+      ')"
+)"
+
+session=$(echo "$session" | sed 's/^\* //; s/^  //')
+
+[[ -z "$session" ]] && exit 0
+
+if [[ -n "${TMUX:-}" ]]; then
+  tmux switch-client -t "$session"
+else
+  tmux attach -t "$session"
+fi
