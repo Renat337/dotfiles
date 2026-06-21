@@ -17,6 +17,7 @@ vim.keymap.set("n", "<leader>cp", function()
     print(path)
 end, { desc = "Copy path to clipboard" })
 
+-- Amazon only
 vim.keymap.set("n", "<leader>cc", function()
     local path = vim.fn.expand("%:p")
     local line = vim.fn.line(".")
@@ -45,3 +46,7 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "moves lines up in visual 
 
 vim.keymap.set("v", "<", "<gv", opts)
 vim.keymap.set("v", ">", ">gv", opts)
+
+vim.keymap.set("n", "<leader>-", "<cmd>split<CR>", opts)
+vim.keymap.set("n", "<leader>\\", "<cmd>vsplit<CR>", opts)
+vim.keymap.set("n", "<leader>x", "<cmd>close<CR>", opts)
