@@ -20,6 +20,8 @@ return {
                 vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Find references" })
                 vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to declaration" })
                 vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
+                vim.keymap.set("n", "gR", vim.lsp.buf.rename, { desc = "Rename symbol" })
+                vim.keymap.set("n", "gl", vim.diagnostic.open_float, { desc = "Line diagnostics" })
             end,
         })
     end,
