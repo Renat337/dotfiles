@@ -4,6 +4,10 @@ current_session() {
   tmux display-message -p '#S' 2>/dev/null
 }
 
+kill_dir="/tmp/tmux-temp"
+kill_flag="$kill_dir/tmux-find-sessions-kill-prev"
+rm -f "$kill_flag"
+
 session="$(
   tmux list-sessions -F "#{session_name}" 2>/dev/null |
   awk -v cur="$(current_session)" '
@@ -15,7 +19,8 @@ session="$(
     --layout=reverse \
     --border \
     --prompt="session> " \
-    --header="ctrl-x: delete" \
+    --header="ctrl-x: delete | ctrl-y: switch & kill prev" \
+    --bind "ctrl-y:execute-silent(mkdir -p $kill_dir && touch $kill_flag)+accept" \
     --bind "ctrl-x:execute-silent(
       tmux kill-session -t \$(echo {} | sed 's/^.. //')
     )+reload(tmux list-sessions -F \"#{session_name}\" 2>/dev/null |
@@ -29,8 +34,15 @@ session=$(echo "$session" | sed 's/^\* //; s/^  //')
 
 [[ -z "$session" ]] && exit 0
 
+prev_session="$(current_session)"
+
 if [[ -n "${TMUX:-}" ]]; then
   tmux switch-client -t "$session"
 else
   tmux attach -t "$session"
 fi
+
+if [[ -f "$kill_flag" && -n "$prev_session" && "$prev_session" != "$session" ]]; then
+  tmux kill-session -t "$prev_session"
+fi
+rm -rf "$kill_dir"
