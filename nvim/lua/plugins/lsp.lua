@@ -1,7 +1,7 @@
 return {
     "mason-org/mason-lspconfig.nvim",
     opts = {
-        ensure_installed = { "lua_ls", "pyright", "ts_ls", "jdtls", "bashls", "jsonls", "clangd", "rust_analyzer" },
+        ensure_installed = { "lua_ls", "pyright", "ts_ls", "jdtls", "bashls", "jsonls", "clangd", "rust_analyzer", "roslyn_ls" },
         -- jdtls is excluded because nvim-jdtls manages it with bemol workspace folders
         automatic_enable = {
             exclude = { "jdtls" },
