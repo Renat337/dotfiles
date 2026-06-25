@@ -18,6 +18,7 @@ return {
                 cpp = true,
                 c = true,
                 rust = true,
+                cs = true,
             }
             return enabled_filetypes[vim.bo.filetype] or false
         end,
