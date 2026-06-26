@@ -25,5 +25,6 @@ return {
             })
         end, { desc = "Telescope find directories" })
         vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "Find all keymaps" })
+        vim.keymap.set("n", "<leader>fs", builtin.git_status, { desc = "Telescope git status" })
     end,
 }
