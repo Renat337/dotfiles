@@ -9,8 +9,12 @@ return {
                    if oil and oil.get_current_dir() then
                        return oil.get_current_dir()
                    end
-                   return vim.fn.expand("%:.")
+                   return vim.fn.expand("%:t")
                 end,
+            },
+            lualine_x = {
+                "lsp_status",
+                "filetype",
             },
         },
     },
