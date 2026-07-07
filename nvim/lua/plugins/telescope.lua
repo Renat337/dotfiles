@@ -10,6 +10,21 @@ return {
         require("telescope").setup({
             defaults = {
                 path_display = {"filename_first"},
+                vimgrep_arguments = {
+                    "rg",
+                    "--color=never",
+                    "--no-heading",
+                    "--with-filename",
+                    "--line-number",
+                    "--column",
+                    "--smart-case",
+                    "--follow",
+                },
+            },
+            pickers = {
+                find_files = {
+                    find_command = { "fd", "--type", "f", "--follow", "--hidden", "--exclude", ".git" },
+                },
             },
         })
         local builtin = require("telescope.builtin")
